@@ -1,0 +1,278 @@
+:root {
+	--system-primary-color: rgb(50, 195, 150);
+	--system-primary-color-dark: rgb(15, 140, 95);
+	--system-secondary-color: rgb(240, 255, 255);
+	--system-secondary-color-dark: rgb(220, 240, 240);
+	--system-third-color: rgb(5, 85, 50);
+
+	//Theming Colors
+	--color-primary: rgba(50, 140, 200, 0.92);
+	--color-success: rgba(30, 140, 55, 0.92);
+	--color-warning: rgba(190, 160, 15, 0.92);
+	--color-danger: rgba(195, 50, 35, 0.92);
+	--color-light: rgba(255, 255, 255, 0.92);
+	--color-dark: rgba(40, 50, 70, 0.92);
+	--color-soft-text: #555555;
+
+	--soft-border-color: rgba(0, 0, 0, 0.2);
+	--soft-background-color: rgba(0, 0, 0, 0.05);
+}
+
+@font-face {
+	font-family: "Montserrat";
+	src: local("Montserrat"), url(~assets/webfonts/Montserrat-Regular.ttf) format("truetype");
+}
+
+* {
+	box-sizing: border-box;
+	font-family: "Montserrat", sans-serif;
+}
+
+/*
+GLOBAL TAGS STYLES
+*/
+html,
+body {
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+ul {
+	padding: 0;
+	margin: 0;
+}
+
+li {
+	list-style: none;
+	list-style-type: none;
+}
+
+a {
+	text-decoration: none;
+	color: unset;
+	transition: 0.2s all ease-out;
+}
+
+a:hover {
+	color: var(--system-primary-color) !important;
+	cursor: pointer;
+}
+
+/*
+PAGES STRUCTURE STYLES
+*/
+.page-wrapper {
+	position: relative;
+	width: 100%;
+	height: 100vh;
+	overflow: hidden;
+
+	.page-content {
+		position: absolute;
+		top: 45px;
+		left: 0;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		height: calc(100vh - 135px);
+		padding: 2px 4px;
+	}
+}
+
+.page-wrapper.no-footer .page-content {
+	flex-grow: 1;
+	height: auto;
+	min-height: calc(100vh - 45px);
+}
+
+.page-content-image {
+	margin: 12px auto;
+	width: 100%;
+	max-width: 180px;
+	height: auto;
+	object-fit: contain;
+}
+
+.page-title {
+	font-size: 24px;
+	color: var(--system-primary-color);
+	width: 100%;
+	text-align: center;
+	margin: 8px 0;
+}
+
+.page-description {
+	font-size: 18px;
+	color: var(--color-soft-text);
+	width: 100%;
+	text-align: center;
+}
+
+/*
+GLOBAL REUSEABLE STYLES
+*/
+.banner-box {
+	width: 100%;
+	height: fit-content;
+	margin: 10px auto;
+	padding: 0 2%;
+}
+
+.banner-box img {
+	width: 100%;
+	height: 120px;
+	object-fit: contain;
+}
+
+.center-content {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+}
+
+.padded-content {
+	padding: 5px;
+}
+
+.disabled {
+	filter: grayscale(0.9) !important;
+	background-color: rgba(0, 0, 0, 0.12) !important;
+	pointer-events: none !important;
+	user-select: all;
+}
+
+.block-button {
+	padding: 6px;
+	font-weight: bold;
+	font-size: 13px;
+	text-align: center;
+	border-radius: 2px;
+	border: 1px solid var(--system-primary-color-dark);
+}
+
+.text-ellipsis {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.page-header {
+	margin: 5px auto;
+	text-align: center;
+	border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+	padding: 10px 20%;
+	background-color: rgba(0, 0, 0, 0.03);
+
+	.header-top-holder {
+		display: flex;
+		align-items: center;
+	}
+	.page-title {
+		display: inline-flex;
+		flex-grow: 1;
+		margin: 12px auto;
+		font-size: 36px;
+	}
+	.page-logo {
+		display: inline-flex;
+		flex-grow: 0;
+		width: 128px;
+		height: auto;
+		opacity: 0.85;
+	}
+	.return-button {
+		position: absolute;
+		left: 5px;
+		top: 5px;
+		font-size: 13px;
+		padding: 5px;
+		border: 1px solid #aaaaaa;
+		border-radius: 4px;
+	}
+	.return-button:hover {
+		cursor: pointer;
+		border-color: #777777;
+	}
+}
+
+.img-thumbnail {
+	display: block;
+	width: 100%;
+	height: auto;
+	max-height: 86px;
+	object-fit: contain;
+	margin: 0 auto;
+	text-align: center;
+	border-radius: 8px;
+}
+
+.page-subtitle {
+	text-align: center;
+}
+
+.show-as-animation {
+	animation: show-item 0.5s ease-in 1 forwards;
+	transition: 0.3s all ease-in;
+}
+
+.pagination-box {
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 5px;
+	width: 100%;
+	margin: 2px auto;
+}
+
+.no-style-button {
+	outline: none;
+	border: none;
+	height: 100%;
+	width: fit-content;
+	background: none;
+	padding: 0;
+	margin: 0;
+}
+
+@media (max-width: 991px) {
+	.page-header {
+		padding: 10px 15%;
+	}
+}
+
+@media (max-width: 767px) {
+	.page-wrapper {
+		overflow-y: auto;
+
+		.page-content {
+			position: relative;
+			height: auto;
+			top: 0;
+		}
+	}
+
+	.banner-box img {
+		width: 100%;
+		height: auto;
+		object-fit: contain;
+	}
+
+	.page-header .page-title {
+		font-size: 28px;
+	}
+}
+
+@keyframes show-item {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}

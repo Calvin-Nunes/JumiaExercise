@@ -1,27 +1,30 @@
 import LibUtils from "static/libraries/libUtils";
 
 class ApiHelper {
-	ApiKey = "";
-	ApiUrl = "https://themealdb.com/api/";
-	ApiVersion = "json/v1/";
+	ApiKey = "hOjNh9CbqGgfNV8N7qawjcMchELLkL9X"; //TODO -> Add to secure place before production release
+	ApiUrl = "https://api.nytimes.com/svc/";
 	Endpoints = {
-		categories: "/categories.php",
-		mealDetail: "/lookup.php?i=",
-		category: "/filter.php?c=",
-		searchIngredient: "/filter.php?i=",
+		latest: "news/v3/content/nyt/all.json",
+		search: "search/v2/articlesearch.json?q=",
+		filtered: "news/v3/content/nyt/[CATEGORY].json"
 	};
 
 	constructor(apiKey) {
-		this.ApiKey = apiKey;
+		if (apiKey != null) {
+			this.ApiKey = apiKey;
+		}
 	}
-
+	
 	buildRequestUrl(endpoint, queryParams) {
 		if (LibUtils.isEmpty(endpoint)) {
 			alert("Não é possível enviar a requisição para API: Endpoint inválido");
 		} else {
-			let url = this.ApiUrl + this.ApiVersion + this.ApiKey + endpoint;
+			let url = `${this.ApiUrl}${endpoint}`;
+
 			if (LibUtils.isFilled(queryParams)) {
-				url += queryParams;
+				url += `${queryParams}&api-key=${this.ApiKey}`;
+			} else {
+				url += `?api-key=${this.ApiKey}`
 			}
 
 			return url;

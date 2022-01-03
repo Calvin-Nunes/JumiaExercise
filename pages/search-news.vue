@@ -68,7 +68,7 @@ export default Vue.extend({
 	created() {
 		let queryParams = this.$route.query;
 		if (queryParams != null) {
-			this.searchText = queryParams.ingredient || "";
+			this.searchText = queryParams.searchQuery || "";
 		}
 
 		if (LibUtils.isFilled(this.searchText)) {

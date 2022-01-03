@@ -10,15 +10,15 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'Future Challenge',
+    title: 'Jumia Challenge',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       {
         hid: 'main-head',
-        name: 'future-challenge',
+        name: 'jumia-challenge',
         content:
-          'This web page was developed by Calvin Nunes to complete the Challenge asked by Future, using Vue.Js, Nuxt.js and Javascript',
+          'This web page was developed by Calvin Nunes to complete the Challenge asked by Jumia, using Vue.Js, Nuxt.js and Javascript',
       },
       { name: 'format-detection', content: 'telephone=no' },
     ],

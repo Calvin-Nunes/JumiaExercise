@@ -1,13 +1,13 @@
 <template>
 	<nav class="page-navbar">
 		<div class="nav-left">
-			<nuxt-link to="/" class="logo-link">
-				<img id="navbar-logo" src="~/assets/images/logo-white.png" alt="Logo" />
-			</nuxt-link>
-			<span>MealDB</span>
+			<button id="navbar-menu" @click="openMenu" title="Open menu">
+				<i class="fas fa-bars"></i>
+			</button>
+			<span>Calvin News - {{ todayDate }}</span>
 		</div>
 		<div class="nav-right">
-			<p>Future - Challenge</p>
+			<p>Jumia - Challenge</p>
 		</div>
 	</nav>
 </template>
@@ -20,12 +20,24 @@ const Navbar = Vue.extend({
 	name: "Navbar",
 
 	data() {
-		return {};
+		return {
+			todayDate: new Date(),
+		};
 	},
 
 	props: [],
 
+	created() {
+		this.todayDate = new Date().toLocaleDateString();
+	},
+
 	mounted() {},
+
+	methods: {
+		openMenu: function () {
+			//TODO
+		},
+	},
 
 	computed: {},
 });
@@ -50,16 +62,25 @@ nav {
 	align-items: center;
 	max-width: 35%;
 	padding: 1px 4px;
+	color: #fff;
 }
 
-.nav-left a.logo-link {
-	margin: 0 4px;
+.nav-left #navbar-menu {
+	margin: 0 10px;
+	border: none;
+	background: none;
+	color: #fff;
+	cursor: pointer;
+
+	i{
+		font-size: 20px;
+	}
 }
 
 .nav-left #navbar-logo {
 	width: 36px;
 	height: 36px;
-	margin: 0 4px;
+	margin: 0 4px;	
 }
 
 .nav-right {

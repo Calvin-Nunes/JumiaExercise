@@ -4,7 +4,7 @@
 			<p>Developer Email: calvin_nunes13@hotmail.com</p>
 			<p>Developer Phone: +55 51 98402-9317</p>
 		</div>
-		<div class="footer-column footer-center"><b>MealDB Challenge</b></div>
+		<div class="footer-column footer-center"><b>Jumia Vue.JS Challenge</b></div>
 		<div class="footer-column footer-right">
 			<ul class="footer-links">
 				<li v-for="(link, index) in footerLinks" :key="index">

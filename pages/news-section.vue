@@ -3,14 +3,14 @@
 		<section>
 			<div class="banner-box">
 				<nuxt-link to="/">
-					<img src="~/assets/images/banner.svg" alt="banner" height="250" />
+					<img src="~/assets/images/banner.svg" alt="banner" height="200" />
 				</nuxt-link>
 			</div>
 		</section>
 
 		<section>
 			<div class="categories-bar">
-				<a v-for="(section, i) of getMainSections()" :key="i" class="section-label" @click="goToNewsSection(section)">
+				<a v-for="(section, i) of getMainSections()" :key="i" class="section-label" @click="setSelectedSection(section)">
 					<span class="section-name">{{ section.display_name }}</span>
 				</a>
 			</div>
@@ -18,19 +18,14 @@
 
 		<section>
 			<div class="about-news-box">
-				<h5>
-					{{ newsTitle }}
-				</h5>
-				<div class="input-pesquisa-box">
-					<c-search-box :onSearch="goToSearch" placeholder="What you want to know?" height="28" fontSize="18"></c-search-box>
-				</div>
+				<h5>					{{ sectionTitle }}				</h5>
 			</div>
 		</section>
 
 		<section>
-			<div v-if="errorMessage.length == 0" class="articles-holder">
+			<div class="sectionArticles-holder">
 				<load-spinner v-if="isFetchingData" :loading="isFetchingData"></load-spinner>
-				<a v-for="(article, i) of articles" :key="i" class="thumbnail-article-card show-as-animation" @click="openArticle(article)">
+				<a v-for="(article, i) of sectionArticles" :key="i" class="thumbnail-article-card show-as-animation" @click="openArticle(article)">
 					<div class="thumbnail-article-image-holder">
 						<img :src="getArticleImage(article)" :alt="article.title" />
 					</div>
@@ -38,7 +33,6 @@
 					<p class="thumbnail-article-description">{{ article.abstract }}</p>
 				</a>
 			</div>
-			<div v-else class="fetch-error-display">{{ this.errorMessage }}</div>
 		</section>
 	</div>
 </template>
@@ -50,27 +44,38 @@ import LibUtils from "static/libraries/libUtils";
 import mixinsHelper from "~/mixins/mixins-helper";
 import axios from "axios";
 import LoadSpinner from "@/components/LoadSpinner.vue";
-import SearchBox from "@/components/SearchBox.vue";
 
 export default Vue.extend({
 	components: {
 		"load-spinner": LoadSpinner,
-		"c-search-box": SearchBox,
 	},
 	mixins: [mixinsHelper],
 
 	data: () => {
 		return {
-			searchText: "",
-			articles: [],
+			sectionName: "",
+			section: "",
+			sectionArticles: [],
 			isFetchingData: false,
-			newsTitle: "Top News",
+			sectionTitle: "News",
 			errorMessage: "",
 		};
 	},
 
 	created() {
-		this.getLatestNews();
+		// let queryParams = this.$route.query;
+		// if (queryParams != null) {
+		// 	this.sectionName = queryParams.sectionName || "";
+		// 	this.section = queryParams.section || "";
+		// }
+
+		let section = this.$store.getters.currentSection();
+		if (LibUtils.isFilled(section)) {
+			this.sectionName = section.display_name;
+			this.section = section.section;
+		}
+
+		this.getSectionNews();
 	},
 
 	methods: {
@@ -80,6 +85,7 @@ export default Vue.extend({
 		| ---- */
 		getMainSections: function () {
 			return [
+				{ display_name: "All", section: "all" },
 				{ display_name: "Arts", section: "arts" },
 				{ display_name: "Business", section: "business" },
 				{ display_name: "Politics", section: "politics" },
@@ -90,17 +96,23 @@ export default Vue.extend({
 		},
 
 		/*
-		| função: getLatestNews
+		| função: getSectionNews
 		| Utilizando a classe auxiliar ApiHelper, cria a URL, faz uma chamada GET para API buscar as ultimas noticias do NY Times
 		| ---- */
-		getLatestNews: function () {
+		getSectionNews: function () {
 			const apiHelper = new ApiHelper();
-			let endpoint = apiHelper.Endpoints.latest;
+			let endpoint = apiHelper.Endpoints.filtered;
 			let apiUrl = apiHelper.buildRequestUrl(endpoint);
 
+			if (LibUtils.isEmpty(this.section)) {
+				this.section = "all";
+			}
+
+			apiUrl = apiUrl.replace("[SECTION]", this.section);
+
 			this.isFetchingData = true;
-			this.errorMessage = "";
-			this.newsTitle = "Top News";
+			this.errorMessage = ""
+			this.sectionTitle = this.sectionName || "News";
 
 			if (LibUtils.isFilled(apiUrl)) {
 				axios
@@ -115,8 +127,8 @@ export default Vue.extend({
 						function (error) {
 							this.isFetchingData = false;
 							let errorMsg = "Ops! An error occured while fetching data from API: " + error;
-							alert(errorMsg);
 							this.errorMessage = errorMsg;
+							alert(errorMsg);
 							console.error(errorMsg);
 						}.bind(this)
 					);
@@ -124,10 +136,10 @@ export default Vue.extend({
 		},
 
 		/*
-		| função: goToNewsSection
+		| função: setSelectedSection
 		| navega para pagina de noticias especifica de uma seção
 		| ---- */
-		goToNewsSection: function (section) {
+		setSelectedSection: function (section) {
 			if (LibUtils.isFilled(section)) {
 				this.$store.dispatch("setSection", section);
 				this.navigate("news-section", { sectionName: section.display_name });
@@ -140,7 +152,7 @@ export default Vue.extend({
 		| ---- */
 		verifyData: function (data) {
 			if (LibUtils.isFilled(data)) {
-				this.articles = data.results || [];
+				this.sectionArticles = data.results || [];
 			}
 		},
 
@@ -165,16 +177,6 @@ export default Vue.extend({
 			}
 			return "./assets/images/icon.png"; //TODO -> change to deafult no photo
 		},
-
-		/*
-		| função: goToSearch
-		| Utilizando o texto pesquisado, abre a pagina de pesquisa já com a pesquisa pronta
-		| ---- */
-		goToSearch: function (text) {
-			if (text && text.length > 0) {
-				this.navigate("search-news", { searchQuery: text });
-			}
-		},
 	},
 });
 </script>
@@ -189,7 +191,7 @@ export default Vue.extend({
 	color: var(--system-primary-color);
 }
 
-.articles-holder {
+.sectionArticles-holder {
 	display: flex;
 	gap: 8px;
 	flex-wrap: wrap;
@@ -218,11 +220,34 @@ export default Vue.extend({
 	margin: 0;
 }
 
+//Categories Bar
+.categories-bar {
+	display: flex;
+	justify-content: space-evenly;
+	margin: 5px 5px 15px 5px;
+	padding-bottom: 2px;
+	border-bottom: 1px solid #999999;
+
+	.section-label {
+		display: inline-flex;
+		padding: 0 4px;
+	}
+
+	.section-name {
+		color: #222222;
+		font-size: 14px;
+	}
+
+	.section-label:hover .section-name {
+		color: #999999;
+	}
+}
+
 @media (max-width: 991px) {
 }
 
 @media (max-width: 767px) {
-	.articles-holder {
+	.sectionArticles-holder {
 		padding: 5px;
 		margin: 0 0 10px 0;
 	}
@@ -230,6 +255,10 @@ export default Vue.extend({
 	.input-pesquisa-box {
 		width: 90%;
 		margin: 8px auto;
+	}
+
+	.categories-bar {
+		display: none;
 	}
 
 	.about-news-box {

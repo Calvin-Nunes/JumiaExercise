@@ -15,6 +15,8 @@
 <script>
 import Vue from "vue";
 import LibUtils from "static/libraries/libUtils";
+import ApiHelper from "static/libraries/ApiHelper";
+import axios from "axios";
 
 const Navbar = Vue.extend({
 	name: "Navbar",
@@ -22,6 +24,7 @@ const Navbar = Vue.extend({
 	data() {
 		return {
 			todayDate: new Date(),
+			sections: [],
 		};
 	},
 
@@ -29,6 +32,7 @@ const Navbar = Vue.extend({
 
 	created() {
 		this.todayDate = new Date().toLocaleDateString();
+		this.getSections();
 	},
 
 	mounted() {},
@@ -36,6 +40,45 @@ const Navbar = Vue.extend({
 	methods: {
 		openMenu: function () {
 			//TODO
+		},
+
+		/*
+		| função: getSections
+		| busca a lista de seções de notícias na API do NY times
+		| ---- */
+		getSections: function () {
+			const apiHelper = new ApiHelper();
+			let endpoint = apiHelper.Endpoints.sections;
+			let apiUrl = apiHelper.buildRequestUrl(endpoint);
+
+			if (LibUtils.isFilled(apiUrl)) {
+				axios
+					.get(apiUrl)
+					.then(
+						function (response) {
+							if (LibUtils.isFilled(response) && response.data != null) {
+								this.sections = response.data.results;
+							}
+						}.bind(this)
+					)
+					.catch(
+						function (error) {
+							this.isFetchingData = false;
+							let errorMsg = "Error while fetching sections from API: " + error;
+							console.error(errorMsg);
+							this.sections = [];
+						}.bind(this)
+					);
+			}
+		},
+
+		/*
+		| função: setSection
+		| define na store a section selecionada para buscar artigos/noticias
+		| ---- */
+		setSection: function (section) {
+			debugger;
+			this.$store.dispatch("setSection", section);
 		},
 	},
 
@@ -72,7 +115,7 @@ nav {
 	color: #fff;
 	cursor: pointer;
 
-	i{
+	i {
 		font-size: 20px;
 	}
 }
@@ -80,7 +123,7 @@ nav {
 .nav-left #navbar-logo {
 	width: 36px;
 	height: 36px;
-	margin: 0 4px;	
+	margin: 0 4px;
 }
 
 .nav-right {

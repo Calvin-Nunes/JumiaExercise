@@ -1,4 +1,5 @@
 import LibUtils from "static/libraries/libUtils";
+
 export default {
 	methods: {
 		navigate: function (page, queryParams) {
@@ -22,6 +23,21 @@ export default {
             query = query.replace(/\?/g,"-")
             query = encodeURI(query)
             return query
-        },		
+        },
+		
+		/*
+		| função: openArticle
+		| Listener de click para artigo clicado, ao clicar irá abrir a page com a notícia/artigo detalhado
+		| ---- */
+		openArticle: function (article) {
+			if (LibUtils.isFilled(article)) {
+				let params = {
+					article: article.title,
+					id: article.idCategory,
+				};
+				debugger
+				this.navigate("news", params);
+			}
+		},
 	},
 };

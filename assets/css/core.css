@@ -289,6 +289,41 @@ GLOBAL REUSEABLE STYLES
   margin: 0;
 }
 
+.categories-bar {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
+  margin: 5px 5px 15px 5px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #999999;
+}
+
+.categories-bar .section-label {
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  padding: 0 4px;
+}
+
+.categories-bar .section-name {
+  color: #222222;
+  font-size: 14px;
+}
+
+.categories-bar .section-label:hover .section-name {
+  color: #999999;
+}
+
+.fetch-error-display {
+  color: #cc4411;
+  font-size: 18px;
+  text-align: center;
+  padding: 5px;
+}
+
 @media (max-width: 991px) {
   .page-header {
     padding: 10px 15%;
@@ -312,6 +347,9 @@ GLOBAL REUSEABLE STYLES
   }
   .page-header .page-title {
     font-size: 28px;
+  }
+  .categories-bar {
+    display: none;
   }
 }
 

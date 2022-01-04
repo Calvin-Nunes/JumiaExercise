@@ -6,7 +6,8 @@ class ApiHelper {
 	Endpoints = {
 		latest: "news/v3/content/nyt/all.json",
 		search: "search/v2/articlesearch.json?q=",
-		filtered: "news/v3/content/nyt/[CATEGORY].json"
+		filtered: "news/v3/content/nyt/[SECTION].json",
+		sections: "news/v3/content/section-list.json"
 	};
 
 	constructor(apiKey) {

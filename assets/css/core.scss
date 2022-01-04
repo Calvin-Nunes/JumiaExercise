@@ -240,6 +240,36 @@ GLOBAL REUSEABLE STYLES
 	margin: 0;
 }
 
+//Categories Bar
+.categories-bar {
+	display: flex;
+	justify-content: space-evenly;
+	margin: 5px 5px 15px 5px;
+	padding-bottom: 2px;
+	border-bottom: 1px solid #999999;
+
+	.section-label {
+		display: inline-flex;
+		padding: 0 4px;
+	}
+
+	.section-name {
+		color: #222222;
+		font-size: 14px;
+	}
+
+	.section-label:hover .section-name {
+		color: #999999;
+	}
+}
+
+.fetch-error-display{
+	color: #cc4411;
+	font-size: 18px;
+	text-align:center;
+	padding: 5px;
+}
+
 @media (max-width: 991px) {
 	.page-header {
 		padding: 10px 15%;
@@ -265,6 +295,10 @@ GLOBAL REUSEABLE STYLES
 
 	.page-header .page-title {
 		font-size: 28px;
+	}
+
+	.categories-bar {
+		display: none;
 	}
 }
 

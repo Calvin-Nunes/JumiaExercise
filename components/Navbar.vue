@@ -9,7 +9,7 @@
 		<div class="nav-right">
 			<p>Jumia - Challenge</p>
 		</div>
-		<div v-if="showingMenu" class="navbar-menu">
+		<div class="navbar-menu" :class="showingMenu === true ? 'navbar-menu-open' : ''">
 			<ul>
 				<li v-for="(section, i) of sections" :key="i" class="navbar-menu-list-item">
 					<a @click="setSection(section)">{{ section.display_name }}</a>
@@ -120,13 +120,14 @@ nav {
 	padding: 0 1%;
 	background: var(--system-primary-color-dark);
 	position: relative;
+	font-size: 18px
 }
 
 .nav-left {
 	display: inline-flex;
 	justify-self: flex-start;
 	align-items: center;
-	max-width: 35%;
+	max-width: 50%;
 	padding: 1px 4px;
 	color: #fff;
 }
@@ -152,7 +153,7 @@ nav {
 .nav-right {
 	display: inline-flex;
 	justify-self: flex-end;
-	max-width: 65%;
+	max-width: 50%;
 	padding: 1px 4px;
 	color: #fff;
 }
@@ -160,7 +161,6 @@ nav {
 .navbar-menu {
 	position: absolute;
 	top: 45px;
-	left: 0;
 	height: calc(100vh - 45px);
 	width: 220px;
 	background-color: #fff;
@@ -170,13 +170,26 @@ nav {
 	padding: 8px 5px 8px 12px;
 	z-index: 999;
 	box-shadow: 0px 1px 6px #888888;
+	transition: 0.3s all ease-out;
+	left: -230px;
 
 	.navbar-menu-list-item {
 		margin: 5px 0;
 
 		a {
-			font-size: 14px;
+			font-size: 15px;
 		}
+	}
+}
+
+.navbar-menu-open {
+	left: 0 !important;
+}
+
+@media (max-width: 520px) {
+	.navbar-menu {
+		width: 100%;
+		left: -105%;
 	}
 }
 </style>

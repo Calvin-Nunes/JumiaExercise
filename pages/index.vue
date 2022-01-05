@@ -50,7 +50,7 @@
 				<div class="pagination-box" v-if="totalPages > 1">
 					<c-button caption="< Previous" theme="light" :disabled="currentPage <= 1" :onTap="paginationPreviousPage"> </c-button>
 					<p>{{ currentPage }} / {{ totalPages }}</p>
-					<c-button caption="Next >" theme="light" :disabled="currentPage >= totalPages" :onTap="paginationNextPage"> </c-button>
+					<c-button caption="More >" theme="light" :disabled="currentPage >= totalPages" :onTap="paginationNextPage"> </c-button>
 				</div>
 
 				<div v-if="minorArticles.length > 0" style="width: 100%">
@@ -91,7 +91,7 @@ export default Vue.extend({
 			topArticles: [],
 			minorArticles: [],
 			isFetchingData: false,
-			newsTitle: "Top News",
+			newsTitle: "Latest News",
 			errorMessage: "",
 			perPageLimit: 10,
 			currentPage: 1,
@@ -122,10 +122,11 @@ export default Vue.extend({
 
 		/*
 		| função: getLatestNews
-		| Utilizando a classe auxiliar ApiHelper, cria a URL, faz uma chamada GET para API buscar as ultimas noticias do NY Times
+		| Utilizando a classe auxiliar ApiHelper, cria a URL, faz uma chamada GET para API buscar as 
+		| ultimas noticias do NY Times
 		| ---- */
 		getLatestNews: function () {
-			const apiHelper = new ApiHelper();
+			const apiHelper = new ApiHelper(this.$store.getters.nyTimesApiKey);
 			let endpoint = apiHelper.Endpoints.latest;
 			let apiUrl = apiHelper.buildRequestUrl(endpoint);
 
@@ -173,7 +174,7 @@ export default Vue.extend({
 		| ---- */
 		goToSearch: function (text) {
 			if (text && text.length > 0) {
-				this.navigate("search-article", { searchQuery: text });
+				this.navigate("search-articles", { search: text });
 			}
 		},
 
@@ -255,7 +256,7 @@ export default Vue.extend({
 	padding: 0 12px;
 
 	h5 {
-		font-size: 21px;
+		font-size: 23px;
 		margin: 0;
 	}
 }
@@ -276,6 +277,10 @@ export default Vue.extend({
 	.articles-holder-box {
 		padding: 5px;
 		margin: 0 0 10px 0;
+	}
+
+	.page-title{
+		font-size: 24px;
 	}
 
 	.input-pesquisa-box {

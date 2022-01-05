@@ -69,6 +69,9 @@ export default {
                     }
 
                     if (image != null) {
+                        if (image.url.startsWith("images")){
+                            image.url = "https://static01.nyt.com/"+image.url
+                        }
                         return image.url;
                     }
                 }

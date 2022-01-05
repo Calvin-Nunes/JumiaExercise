@@ -36,7 +36,7 @@
 					<span class="thumbnail-article-date">{{ article.display_date }}</span>
 				</a>
 
-				<div v-if="minorArticles.length > 0"  style="width:100%">
+				<div v-if="minorArticles.length > 0" style="width: 100%">
 					<h4 class="page-section-title">Other Articles</h4>
 					<ul>
 						<li v-for="(article, i) of minorArticles" :key="i" class="thumbnail-minor-article-list-item" @click="openArticle(article)">
@@ -74,17 +74,23 @@ export default Vue.extend({
 			isFetchingData: false,
 			sectionTitle: "News",
 			errorMessage: "",
+			apiHelper: null,
 		};
 	},
 
 	created() {
+		this.apiHelper = new ApiHelper(this.$store.getters.nyTimesApiKey);
 		this.getSelectedSection();
 	},
 
 	methods: {
+		/*
+		| função: getSelectedSection
+		| Busca a section selecionada na store ou na query da URL
+		| ---- */
 		getSelectedSection: function () {
 			let section = this.$store.getters.currentSection;
-			
+
 			if (LibUtils.isFilled(section)) {
 				this.sectionName = section.display_name;
 				this.section = section.section;
@@ -120,21 +126,23 @@ export default Vue.extend({
 		| Utilizando a classe auxiliar ApiHelper, cria a URL, faz uma chamada GET para API buscar as ultimas noticias do NY Times
 		| ---- */
 		getSectionNews: function () {
-			const apiHelper = new ApiHelper();
-			let endpoint = apiHelper.Endpoints.filtered;
-			let apiUrl = apiHelper.buildRequestUrl(endpoint);
+			let endpoint = this.apiHelper.Endpoints.filtered;
+			let apiUrl = this.apiHelper.buildRequestUrl(endpoint);
 
 			if (LibUtils.isEmpty(this.section)) {
 				this.section = "all";
 			}
 
+			let sectionDisplayName = this.sectionName || this.section || "News";
+			this.section = this.section.replace(/ /g, "").replace(/[.]/g, "").toLowerCase();
+
 			apiUrl = apiUrl.replace("[SECTION]", this.section);
 
 			this.isFetchingData = true;
 			this.errorMessage = "";
-			this.sectionTitle = this.sectionName || this.section || "News";
-			this.topArticles = []
-			this.minorArticles = []
+			this.sectionTitle = sectionDisplayName;
+			this.topArticles = [];
+			this.minorArticles = [];
 
 			if (LibUtils.isFilled(apiUrl)) {
 				axios
@@ -143,6 +151,8 @@ export default Vue.extend({
 						function (response) {
 							this.isFetchingData = false;
 							this.normalizeArticlesData(response.data);
+
+							//TODO -> adicionar paginação para melhorar fluidez da pagina
 						}.bind(this)
 					)
 					.catch(
@@ -205,7 +215,7 @@ export default Vue.extend({
 	justify-content: space-between;
 
 	h5 {
-		font-size: 21px;
+		font-size: 23px;
 		margin: 0;
 	}
 }

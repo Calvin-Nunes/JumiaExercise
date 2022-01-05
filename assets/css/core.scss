@@ -18,10 +18,7 @@
 	--soft-background-color: rgba(0, 0, 0, 0.05);
 }
 
-@font-face {
-	font-family: 'Cormorant Garamond', serif;
-	src: local("CormorantGaramond"), url(~assets/webfonts/CormorantGaramond-Regular.ttf) format("truetype");
-}
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond&display=swap');
 
 * {
 	box-sizing: border-box;
@@ -124,7 +121,7 @@ GLOBAL REUSEABLE STYLES
 
 .banner-box img {
 	width: 100%;
-	height: 120px;
+	height: 100px;
 	object-fit: contain;
 }
 

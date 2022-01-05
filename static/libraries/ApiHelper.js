@@ -1,7 +1,7 @@
 import LibUtils from "static/libraries/libUtils";
 
 class ApiHelper {
-	ApiKey = "hOjNh9CbqGgfNV8N7qawjcMchELLkL9X"; //TODO -> Add to secure place before production release
+	ApiKey = "";
 	ApiUrl = "https://api.nytimes.com/svc/";
 	Endpoints = {
 		latest: "news/v3/content/nyt/all.json",

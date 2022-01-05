@@ -7,7 +7,7 @@
 				<div class="page-header">
 					<a @click="$router.go(-1)" class="return-button">Back</a>
 					<div class="header-box">
-						<h1 class="page-title article-name">{{ article.title }}</h1>
+						<h1 class="page-title article-headline">{{ article.title }}</h1>
 						<h4 class="article-section" @click="goToSection(article.section)">{{ article.section || "" }}</h4>
 						<span class="article-update-date">{{ article.display_date || "" }}</span>
 					</div>
@@ -131,7 +131,7 @@ export default Vue.extend({
 	flex-direction: column;
 }
 
-.article-name {
+.article-headline {
 	text-align: left;
 }
 
@@ -140,6 +140,7 @@ export default Vue.extend({
 	color: #666666;
 	text-align: left;
 	margin: 0;
+	font-size: 18px;
 
 	&:hover {
 		color: black;
@@ -148,7 +149,7 @@ export default Vue.extend({
 }
 
 .article-photo {
-	max-width: 512px;
+	max-width: 480px;
 	width: 100%;
 	height: auto;
 	object-fit: contain;
@@ -195,24 +196,24 @@ export default Vue.extend({
 	background-color: var(--color-primary);
 	padding: 3px 5px;
 	color: #eeeeee;
-	font-size: 13px;
+	font-size: 14px;
 }
 
 .article-source {
 	margin-top: 8px;
-	font-size: 13px;
+	font-size: 14px;
 	font-style: italic;
 	color: #888888;
 }
 
 .article-writer {
 	color: #666666;
-	font-size: 14px;
+	font-size: 15px;
 }
 
 .article-update-date {
 	color: #888888;
-	font-size: 12px;
+	font-size: 14px;
 	text-align: left;
 	margin-top: 2px;
 
@@ -223,7 +224,7 @@ export default Vue.extend({
 
 .article-original-date {
 	color: #888888;
-	font-size: 12px;
+	font-size: 13px;
 }
 
 @media (max-width: 991px) {
@@ -252,12 +253,13 @@ export default Vue.extend({
 		margin: 0px;
 	}
 
-	.article-name {
-		font-size: 28px;
+	.article-headline {
+		font-size: 30px;
+		margin-top: 18px;
 	}
 
 	.article-section {
-		font-size: 18px;
+		font-size: 16px;
 	}
 
 	.header-right {

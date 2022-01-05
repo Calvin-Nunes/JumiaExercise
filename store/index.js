@@ -1,8 +1,7 @@
-//NÃO USADO NESTE PROJETO
-// holds your root state
 export const state = () => ({
 	currentSection: null,
 	article: null,
+	nyTimesApiKey: "hOjNh9CbqGgfNV8N7qawjcMchELLkL9X"
 });
 
 //Actions
@@ -29,4 +28,5 @@ export const mutations = {
 export const getters = {
 	currentSection: (state) => { return state.currentSection },
 	article: (state) => { return state.article },
+	nyTimesApiKey:(state) => {return state.nyTimesApiKey}
 };

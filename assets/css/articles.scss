@@ -1,4 +1,3 @@
-
 .thumbnail-article-card {
 	width: calc(33% - 8px);
 	display: inline-flex;
@@ -6,7 +5,7 @@
 	border: 1px solid rgb(210, 210, 210);
 	transition: 0.35s all ease-in;
 	align-items: center;
-	background: linear-gradient(135deg, #f1f1f1 0%, #fafafa 40%, #f1f1f1 90%);
+	background: linear-gradient(180deg, #f6f6f6 0%, #ffffff 60%, #f6f6f6 90%);
 	position: relative;
 
 	.thumbnail-article-image-holder {
@@ -15,7 +14,7 @@
 		max-height: 256px;
 		margin: 10px 0;
 	}
-	
+
 	.thumbnail-article-image-holder img {
 		display: block;
 		width: 100%;
@@ -32,29 +31,29 @@
 		margin: 5px 0;
 		padding: 0 5px;
 		color: #222222;
+		font-size: 18px;
 	}
 
-
 	.thumbnail-article-description {
-		font-size: 14px;
+		font-size: 16px;
 		margin: 10px 5px 5px 5px;
-		color: #555555;
+		color: #444444;
 		overflow: hidden;
 		padding: 0 8px;
 		margin-bottom: 20px;
 	}
 
-	.thumbnail-article-date{
-		font-size: 12px;
+	.thumbnail-article-date {
+		font-size: 13px;
 		text-align: right;
-		width:100%;
+		width: 100%;
 		padding: 0 5px;
 		color: #888888;
 		bottom: 0px;
 		position: absolute;
 
-		&::before{
-			content: "Last update: "
+		&::before {
+			content: "Last update: ";
 		}
 	}
 
@@ -63,70 +62,72 @@
 		background: rgba(50, 140, 240, 0.2);
 		cursor: pointer;
 	}
-	
+
 	&:hover .thumbnail-article-title {
 		color: #000000;
 	}
 }
 
-.thumbnail-article-card[data-article-index="0"]{
-	width: calc(100% - 16px);
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	border: none;
-	border-bottom: 1px solid rgb(210, 210, 210);
-	margin-top: 15px;
-	transition: 0.35s all ease-in;
-	justify-content: space-evenly;
-	background: none;
-	position: relative;
-	padding: 5px;
-
-	.thumbnail-article-image-holder {
-		display: inline-flex;
-		max-width: calc(50% - 8px);
-		max-height: 380px;
-		margin: 0 8px 0 0;
-	}
-	
-	.thumbnail-article-image-holder img {
-		display: block;
-		width: 100%;
-		max-width: 380px;
-		height: auto;
-		max-height: 380px;
-		object-fit: contain;
-		margin: 0 auto;
-		text-align: center;
-	}
-
-	.thumbnail-article-infos{
-		display: inline-flex;
-		flex-direction: column;
-		justify-content: center;
-		flex-grow: 1;
-		max-width: 50%;
-	}
-
-	.thumbnail-article-title {
-		text-align: left;
+@media (min-width: 768px) {
+	.thumbnail-article-card[data-article-index="0"] {
+		width: calc(100% - 16px);
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		border: none;
+		border-bottom: 1px solid rgb(210, 210, 210);
+		margin-top: 15px;
+		transition: 0.35s all ease-in;
+		justify-content: space-evenly;
+		background: none;
+		position: relative;
 		padding: 5px;
-		color: #222222;
-		margin: 0;
-		font-size: 18px;
-	}
 
-	.thumbnail-article-description {
-		font-size: 14px;
-		color: #555555;
-		overflow: hidden;
-		padding: 8px;
-		margin: 0;
+		.thumbnail-article-image-holder {
+			display: inline-flex;
+			max-width: calc(50% - 8px);
+			max-height: 380px;
+			margin: 0 8px 0 0;
+		}
+
+		.thumbnail-article-image-holder img {
+			display: block;
+			width: 100%;
+			max-width: 380px;
+			height: auto;
+			max-height: 380px;
+			object-fit: contain;
+			margin: 0 auto;
+			text-align: center;
+		}
+
+		.thumbnail-article-infos {
+			display: inline-flex;
+			flex-direction: column;
+			justify-content: center;
+			flex-grow: 1;
+			max-width: 50%;
+		}
+
+		.thumbnail-article-title {
+			text-align: left;
+			padding: 5px;
+			color: #222222;
+			margin: 0;
+			font-size: 22px;
+		}
+
+		.thumbnail-article-description {
+			font-size: 17px;
+			color: #555555;
+			overflow: hidden;
+			padding: 8px;
+			margin: 0;
+		}
 	}
 }
 
-.thumbnail-minor-article-list-item{
+.thumbnail-minor-article-list-item {
 	width: 100%;
 	margin: 8px 0;
 	padding: 0 4px;
@@ -136,10 +137,9 @@
 		margin: 5px 0;
 		padding: 0 5px;
 		color: #222222;
-		font-size: 15px;
+		font-size: 17px;
 	}
-	
-	
+
 	&:hover .thumbnail-article-title {
 		color: #555555;
 		cursor: pointer;
@@ -147,13 +147,13 @@
 }
 
 @media (max-width: 991px) {
-	.thumbnail-thumbnail-article-card {
+	.thumbnail-article-card {
 		width: calc(50% - 5px);
 	}
 }
 
 @media (max-width: 767px) {
-	.thumbnail-thumbnail-article-card {
+	.thumbnail-article-card {
 		width: calc(100% - 5px);
 	}
 }

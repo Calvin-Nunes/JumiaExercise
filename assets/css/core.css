@@ -16,14 +16,14 @@
 }
 
 @font-face {
-  font-family: "Montserrat";
-  src: local("Montserrat"), url(~assets/webfonts/Montserrat-Regular.ttf) format("truetype");
+  font-family: 'Cormorant Garamond', serif;
+  src: local("CormorantGaramond"), url(~assets/webfonts/CormorantGaramond-Regular.ttf) format("truetype");
 }
 
 * {
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
-  font-family: "Montserrat", sans-serif;
+  font-family: 'Cormorant Garamond', serif;
 }
 
 /*
@@ -84,7 +84,6 @@ PAGES STRUCTURE STYLES
           flex-direction: column;
   width: 100%;
   height: calc(100vh - 135px);
-  padding: 2px 4px;
 }
 
 .page-wrapper.no-footer .page-content {
@@ -106,7 +105,7 @@ PAGES STRUCTURE STYLES
 
 .page-title {
   font-size: 24px;
-  color: var(--system-primary-color);
+  color: black;
   width: 100%;
   text-align: center;
   margin: 8px 0;
@@ -154,6 +153,15 @@ GLOBAL REUSEABLE STYLES
 
 .padded-content {
   padding: 5px;
+}
+
+.page-section-title {
+  width: 100%;
+  text-align: center;
+  padding: 5px 0;
+  border-top: 1px solid #bbbbbb;
+  border-bottom: 1px solid #bbbbbb;
+  background-color: #f8f8f8;
 }
 
 .disabled {
@@ -296,9 +304,11 @@ GLOBAL REUSEABLE STYLES
   -webkit-box-pack: space-evenly;
       -ms-flex-pack: space-evenly;
           justify-content: space-evenly;
-  margin: 5px 5px 15px 5px;
-  padding-bottom: 2px;
-  border-bottom: 1px solid #999999;
+  margin-top: 5px;
+  padding: 5px 0;
+  border-bottom: 1px solid #bbbbbb;
+  border-top: 1px solid #bbbbbb;
+  background-color: #f8f8f8;
 }
 
 .categories-bar .section-label {

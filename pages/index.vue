@@ -3,7 +3,7 @@
 		<section>
 			<div class="banner-box">
 				<nuxt-link to="/">
-					<img src="~/assets/images/banner.svg" alt="banner" height="250" />
+					<img src="~/assets/images/banner.png" alt="banner" height="250" />
 				</nuxt-link>
 			</div>
 		</section>
@@ -17,7 +17,7 @@
 		</section>
 
 		<section>
-			<div class="about-news-box">
+			<div class="about-article-box">
 				<h5>
 					{{ newsTitle }}
 				</h5>
@@ -28,15 +28,39 @@
 		</section>
 
 		<section>
-			<div v-if="errorMessage.length == 0" class="articles-holder">
+			<div v-if="errorMessage.length == 0" class="articles-holder-box" ref="section_top_articles">
 				<load-spinner v-if="isFetchingData" :loading="isFetchingData"></load-spinner>
-				<a v-for="(article, i) of articles" :key="i" class="thumbnail-article-card show-as-animation" @click="openArticle(article)">
+
+				<a
+					v-for="(article, i) of displayingArticles"
+					:key="i"
+					class="thumbnail-article-card show-as-animation"
+					:data-article-index="i"
+					@click="openArticle(article)">
 					<div class="thumbnail-article-image-holder">
-						<img :src="getArticleImage(article)" :alt="article.title" />
+						<img :src="article.thumbnail_image" :alt="article.title" />
 					</div>
-					<h4 class="thumbnail-article-title">{{ article.title }}</h4>
-					<p class="thumbnail-article-description">{{ article.abstract }}</p>
+					<div class="thumbnail-article-infos">
+						<h4 class="thumbnail-article-title">{{ article.title }}</h4>
+						<p class="thumbnail-article-description">{{ article.abstract }}</p>
+					</div>
+					<span class="thumbnail-article-date">{{ article.display_date }}</span>
 				</a>
+
+				<div class="pagination-box" v-if="totalPages > 1">
+					<c-button caption="< Previous" theme="light" :disabled="currentPage <= 1" :onTap="paginationPreviousPage"> </c-button>
+					<p>{{ currentPage }} / {{ totalPages }}</p>
+					<c-button caption="Next >" theme="light" :disabled="currentPage >= totalPages" :onTap="paginationNextPage"> </c-button>
+				</div>
+
+				<div v-if="minorArticles.length > 0" style="width: 100%">
+					<h4 class="page-section-title">Other Articles</h4>
+					<ul>
+						<li v-for="(article, i) of minorArticles" :key="i" class="thumbnail-minor-article-list-item" @click="openArticle(article)">
+							<span class="thumbnail-article-title">{{ article.title }}</span>
+						</li>
+					</ul>
+				</div>
 			</div>
 			<div v-else class="fetch-error-display">{{ this.errorMessage }}</div>
 		</section>
@@ -48,6 +72,7 @@ import Vue from "vue";
 import ApiHelper from "static/libraries/ApiHelper";
 import LibUtils from "static/libraries/libUtils";
 import mixinsHelper from "~/mixins/mixins-helper";
+import articlesMixins from "~/mixins/articles";
 import axios from "axios";
 import LoadSpinner from "@/components/LoadSpinner.vue";
 import SearchBox from "@/components/SearchBox.vue";
@@ -57,19 +82,25 @@ export default Vue.extend({
 		"load-spinner": LoadSpinner,
 		"c-search-box": SearchBox,
 	},
-	mixins: [mixinsHelper],
+	mixins: [mixinsHelper, articlesMixins],
 
 	data: () => {
 		return {
 			searchText: "",
-			articles: [],
+			displayingArticles: [],
+			topArticles: [],
+			minorArticles: [],
 			isFetchingData: false,
 			newsTitle: "Top News",
 			errorMessage: "",
+			perPageLimit: 10,
+			currentPage: 1,
+			totalPages: 1,
 		};
 	},
 
 	created() {
+		this.$store.dispatch("setSection", null);
 		this.getLatestNews();
 	},
 
@@ -101,6 +132,8 @@ export default Vue.extend({
 			this.isFetchingData = true;
 			this.errorMessage = "";
 			this.newsTitle = "Top News";
+			this.topArticles = [];
+			this.minorArticles = [];
 
 			if (LibUtils.isFilled(apiUrl)) {
 				axios
@@ -108,14 +141,14 @@ export default Vue.extend({
 					.then(
 						function (response) {
 							this.isFetchingData = false;
-							this.verifyData(response.data);
+							this.normalizeArticlesData(response.data);
+							this.buildVirtualPagination();
 						}.bind(this)
 					)
 					.catch(
 						function (error) {
 							this.isFetchingData = false;
 							let errorMsg = "Ops! An error occured while fetching data from API: " + error;
-							alert(errorMsg);
 							this.errorMessage = errorMsg;
 							console.error(errorMsg);
 						}.bind(this)
@@ -130,40 +163,8 @@ export default Vue.extend({
 		goToNewsSection: function (section) {
 			if (LibUtils.isFilled(section)) {
 				this.$store.dispatch("setSection", section);
-				this.navigate("news-section", { sectionName: section.display_name });
+				this.navigate("articles-section", { section: section.section });
 			}
-		},
-
-		/*
-		| função: verifyData
-		| Verifica integridade dos dados recebidos e caso ok, atribui à propriedade
-		| ---- */
-		verifyData: function (data) {
-			if (LibUtils.isFilled(data)) {
-				this.articles = data.results || [];
-			}
-		},
-
-		/*
-		| função: getArticleImage
-		| retorna a imagem que representa o artigo/notícia
-		| ---- */
-		getArticleImage: function (article) {
-			if (LibUtils.isFilled(article)) {
-				let multimedias = article.multimedia;
-				if (multimedias != null && multimedias.length > 0) {
-					let image = multimedias.find((x) => x.type == "image" && x.format == "mediumThreeByTwo440");
-
-					if (image == null) {
-						image = multimedias.find((x) => x.type == "image");
-					}
-
-					if (image != null) {
-						return image.url;
-					}
-				}
-			}
-			return "./assets/images/icon.png"; //TODO -> change to deafult no photo
 		},
 
 		/*
@@ -172,8 +173,55 @@ export default Vue.extend({
 		| ---- */
 		goToSearch: function (text) {
 			if (text && text.length > 0) {
-				this.navigate("search-news", { searchQuery: text });
+				this.navigate("search-article", { searchQuery: text });
 			}
+		},
+
+		/*
+		| função: buildVirtualPagination
+		| Corre do ponto inicial ao limite por exibição e coloca no array que será usado para exibição
+		| ---- */
+		buildVirtualPagination: function () {
+			this.totalPages = Math.ceil(this.topArticles.length / this.perPageLimit);
+
+			this.displayingArticles = [];
+			let i = (this.currentPage - 1) * this.perPageLimit;
+
+			let limite = i > 0 ? i * 2 : this.perPageLimit;
+			if (limite >= this.topArticles.length) {
+				limite = this.topArticles.length;
+			}
+
+			for (i; i < limite; i++) {
+				let article = this.topArticles[i];
+				if (LibUtils.isFilled(article)) {
+					this.displayingArticles.push(article);
+				}
+			}
+
+			let scrollTo = this.$refs.section_top_articles;
+			if (scrollTo != null) {
+				scrollTo.scrollIntoView({ behavior: "smooth" });
+			}
+		},
+
+		/*		 
+		| funções relativas à avançar e recuar paginação
+		| ---- */
+		paginationNextPage: function () {
+			this.currentPage++;
+			if (this.currentPage > this.totalPages) {
+				this.currentPage = this.totalPages;
+			}
+			this.buildVirtualPagination();
+		},
+
+		paginationPreviousPage: function () {
+			this.currentPage--;
+			if (this.currentPage < 1) {
+				this.currentPage = 1;
+			}
+			this.buildVirtualPagination();
 		},
 	},
 });
@@ -189,23 +237,22 @@ export default Vue.extend({
 	color: var(--system-primary-color);
 }
 
-.articles-holder {
+.articles-holder-box {
 	display: flex;
 	gap: 8px;
 	flex-wrap: wrap;
 	margin: 0 3% 10px 3%;
-	padding: 10px;
-	background: linear-gradient(135deg, #ecf0ee 0%, #f5f5f5 40%, #e2e7e4 90%);
 	border-radius: 5px;
-	box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-.about-news-box {
+.about-article-box {
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
-	padding: 0 3%;
 	justify-content: space-between;
+	border-bottom: 1px solid #bbbbbb;
+	background-color: #f8f8f8;
+	padding: 0 12px;
 
 	h5 {
 		font-size: 21px;
@@ -218,11 +265,15 @@ export default Vue.extend({
 	margin: 0;
 }
 
+.pagination-box button {
+	font-size: 18px;
+}
+
 @media (max-width: 991px) {
 }
 
 @media (max-width: 767px) {
-	.articles-holder {
+	.articles-holder-box {
 		padding: 5px;
 		margin: 0 0 10px 0;
 	}
@@ -232,11 +283,16 @@ export default Vue.extend({
 		margin: 8px auto;
 	}
 
-	.about-news-box {
+	.about-article-box {
 		h5 {
 			width: 100%;
 			text-align: center;
 		}
+	}
+
+	.pagination-box {
+		padding-left: 5px;
+		padding-right: 5px;
 	}
 }
 </style>

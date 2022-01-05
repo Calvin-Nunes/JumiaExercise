@@ -3,7 +3,7 @@
 		<section>
 			<div class="banner-box">
 				<nuxt-link to="/">
-					<img src="~/assets/images/banner.svg" alt="banner" height="200" />
+					<img src="~/assets/images/banner.png" alt="banner" height="200" />
 				</nuxt-link>
 			</div>
 		</section>
@@ -17,22 +17,35 @@
 		</section>
 
 		<section>
-			<div class="about-news-box">
-				<h5>					{{ sectionTitle }}				</h5>
+			<div class="about-article-box">
+				<h5>{{ sectionTitle }}</h5>
 			</div>
 		</section>
 
 		<section>
-			<div class="sectionArticles-holder">
+			<div v-if="errorMessage.length == 0" class="articles-holder-box">
 				<load-spinner v-if="isFetchingData" :loading="isFetchingData"></load-spinner>
-				<a v-for="(article, i) of sectionArticles" :key="i" class="thumbnail-article-card show-as-animation" @click="openArticle(article)">
+				<a v-for="(article, i) of topArticles" :key="i" class="thumbnail-article-card show-as-animation" @click="openArticle(article)">
 					<div class="thumbnail-article-image-holder">
-						<img :src="getArticleImage(article)" :alt="article.title" />
+						<img :src="article.thumbnail_image" :alt="article.title" />
 					</div>
-					<h4 class="thumbnail-article-title">{{ article.title }}</h4>
-					<p class="thumbnail-article-description">{{ article.abstract }}</p>
+					<div class="thumbnail-article-infos">
+						<h4 class="thumbnail-article-title">{{ article.title }}</h4>
+						<p class="thumbnail-article-description">{{ article.abstract }}</p>
+					</div>
+					<span class="thumbnail-article-date">{{ article.display_date }}</span>
 				</a>
+
+				<div v-if="minorArticles.length > 0"  style="width:100%">
+					<h4 class="page-section-title">Other Articles</h4>
+					<ul>
+						<li v-for="(article, i) of minorArticles" :key="i" class="thumbnail-minor-article-list-item" @click="openArticle(article)">
+							<span class="thumbnail-article-title">{{ article.title }}</span>
+						</li>
+					</ul>
+				</div>
 			</div>
+			<div v-else class="fetch-error-display">{{ this.errorMessage }}</div>
 		</section>
 	</div>
 </template>
@@ -42,6 +55,7 @@ import Vue from "vue";
 import ApiHelper from "static/libraries/ApiHelper";
 import LibUtils from "static/libraries/libUtils";
 import mixinsHelper from "~/mixins/mixins-helper";
+import articlesMixins from "~/mixins/articles";
 import axios from "axios";
 import LoadSpinner from "@/components/LoadSpinner.vue";
 
@@ -49,13 +63,14 @@ export default Vue.extend({
 	components: {
 		"load-spinner": LoadSpinner,
 	},
-	mixins: [mixinsHelper],
+	mixins: [mixinsHelper, articlesMixins],
 
 	data: () => {
 		return {
 			sectionName: "",
 			section: "",
-			sectionArticles: [],
+			topArticles: [],
+			minorArticles: [],
 			isFetchingData: false,
 			sectionTitle: "News",
 			errorMessage: "",
@@ -63,22 +78,27 @@ export default Vue.extend({
 	},
 
 	created() {
-		// let queryParams = this.$route.query;
-		// if (queryParams != null) {
-		// 	this.sectionName = queryParams.sectionName || "";
-		// 	this.section = queryParams.section || "";
-		// }
-
-		let section = this.$store.getters.currentSection();
-		if (LibUtils.isFilled(section)) {
-			this.sectionName = section.display_name;
-			this.section = section.section;
-		}
-
-		this.getSectionNews();
+		this.getSelectedSection();
 	},
 
 	methods: {
+		getSelectedSection: function () {
+			let section = this.$store.getters.currentSection;
+			
+			if (LibUtils.isFilled(section)) {
+				this.sectionName = section.display_name;
+				this.section = section.section;
+			}
+
+			if (LibUtils.isEmpty(this.section)) {
+				let queryParams = this.$route.query;
+				if (queryParams != null) {
+					this.section = queryParams.section;
+				}
+			}
+			this.getSectionNews();
+		},
+
 		/*
 		| função: getMainSections
 		| retorna uma lista fixa de categorias de notícias/artigos
@@ -111,8 +131,10 @@ export default Vue.extend({
 			apiUrl = apiUrl.replace("[SECTION]", this.section);
 
 			this.isFetchingData = true;
-			this.errorMessage = ""
-			this.sectionTitle = this.sectionName || "News";
+			this.errorMessage = "";
+			this.sectionTitle = this.sectionName || this.section || "News";
+			this.topArticles = []
+			this.minorArticles = []
 
 			if (LibUtils.isFilled(apiUrl)) {
 				axios
@@ -120,7 +142,7 @@ export default Vue.extend({
 					.then(
 						function (response) {
 							this.isFetchingData = false;
-							this.verifyData(response.data);
+							this.normalizeArticlesData(response.data);
 						}.bind(this)
 					)
 					.catch(
@@ -128,7 +150,6 @@ export default Vue.extend({
 							this.isFetchingData = false;
 							let errorMsg = "Ops! An error occured while fetching data from API: " + error;
 							this.errorMessage = errorMsg;
-							alert(errorMsg);
 							console.error(errorMsg);
 						}.bind(this)
 					);
@@ -141,42 +162,19 @@ export default Vue.extend({
 		| ---- */
 		setSelectedSection: function (section) {
 			if (LibUtils.isFilled(section)) {
-				this.$store.dispatch("setSection", section);
-				this.navigate("news-section", { sectionName: section.display_name });
-			}
-		},
-
-		/*
-		| função: verifyData
-		| Verifica integridade dos dados recebidos e caso ok, atribui à propriedade
-		| ---- */
-		verifyData: function (data) {
-			if (LibUtils.isFilled(data)) {
-				this.sectionArticles = data.results || [];
-			}
-		},
-
-		/*
-		| função: getArticleImage
-		| retorna a imagem que representa o artigo/notícia
-		| ---- */
-		getArticleImage: function (article) {
-			if (LibUtils.isFilled(article)) {
-				let multimedias = article.multimedia;
-				if (multimedias != null && multimedias.length > 0) {
-					let image = multimedias.find((x) => x.type == "image" && x.format == "mediumThreeByTwo440");
-
-					if (image == null) {
-						image = multimedias.find((x) => x.type == "image");
-					}
-
-					if (image != null) {
-						return image.url;
-					}
+				if (section.section === "all") {
+					this.navigate("/");
+				} else {
+					this.sectionName = "TESTE";
+					this.$store.dispatch("setSection", section);
+					this.navigate("articles-section", { section: section.section }, true);
 				}
 			}
-			return "./assets/images/icon.png"; //TODO -> change to deafult no photo
 		},
+	},
+
+	watch: {
+		"$route.query": "getSelectedSection",
 	},
 });
 </script>
@@ -191,22 +189,19 @@ export default Vue.extend({
 	color: var(--system-primary-color);
 }
 
-.sectionArticles-holder {
+.articles-holder-box {
 	display: flex;
 	gap: 8px;
 	flex-wrap: wrap;
 	margin: 0 3% 10px 3%;
-	padding: 10px;
-	background: linear-gradient(135deg, #ecf0ee 0%, #f5f5f5 40%, #e2e7e4 90%);
 	border-radius: 5px;
-	box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-.about-news-box {
+.about-article-box {
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
-	padding: 0 3%;
+	margin: 5px calc(3% + 16px);
 	justify-content: space-between;
 
 	h5 {
@@ -220,34 +215,11 @@ export default Vue.extend({
 	margin: 0;
 }
 
-//Categories Bar
-.categories-bar {
-	display: flex;
-	justify-content: space-evenly;
-	margin: 5px 5px 15px 5px;
-	padding-bottom: 2px;
-	border-bottom: 1px solid #999999;
-
-	.section-label {
-		display: inline-flex;
-		padding: 0 4px;
-	}
-
-	.section-name {
-		color: #222222;
-		font-size: 14px;
-	}
-
-	.section-label:hover .section-name {
-		color: #999999;
-	}
-}
-
 @media (max-width: 991px) {
 }
 
 @media (max-width: 767px) {
-	.sectionArticles-holder {
+	.topArticles-holder {
 		padding: 5px;
 		margin: 0 0 10px 0;
 	}
@@ -261,7 +233,7 @@ export default Vue.extend({
 		display: none;
 	}
 
-	.about-news-box {
+	.about-article-box {
 		h5 {
 			width: 100%;
 			text-align: center;

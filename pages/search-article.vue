@@ -4,35 +4,35 @@
 			<div class="page-header">
 				<a @click="$router.go(-1)" class="return-button">Back</a>
 				<div class="header-top-holder">
-					<h1 class="page-title">Ingredient: {{ getSearchedIngredientDisplay() }}</h1>
+					<h1 class="page-title">Searching: {{ getSearchedTextDisplay() }}</h1>
 					<img src="~/assets/images/icon.png" class="page-logo" />
 				</div>
 				<div class="input-pesquisa-box">
-					<c-search-box :onSearch="getMealsByIngredient" placeholder="What ingredient is your favorite?" height="50" fontSize="20"></c-search-box>
+					<c-search-box :onSearch="getSearchedArticles" placeholder="What you want to know?" height="50" fontSize="20"></c-search-box>
 				</div>
 			</div>
 		</section>
-		<section ref="section_meals">
-			<h4 class="page-subtitle">Meals</h4>
-			<div class="meals-holder">
+		<section ref="section_articles">
+			<h4 class="page-subtitle">Articles found</h4>
+			<div class="articles-holder">
 				<load-spinner v-if="isFetchingData" :loading="isFetchingData"></load-spinner>
 				<div
-					v-else-if="meals.length > 0"
-					v-for="meal of mealsDisplaying"
-					:key="meal.idMeal"
-					class="meal-row show-as-animation"
-					@click="goToMealDetails(meal)">
-					<div class="meal-image-holder">
-						<img :src="meal.strMealThumb" :alt="meal.strMeal"  class="img-thumbnail"/>
+					v-else-if="articles.length > 0"
+					v-for="(article, i) of articles"
+					:key="i"
+					class="article-row show-as-animation"
+					@click="openArticle(article)">
+					<div class="article-image-holder">
+						<img :src="article.thumbnail_image" :alt="article.headline" class="img-thumbnail" />
 					</div>
-					<p class="meal-name">{{ meal.strMeal }}</p>
+					<p class="article-name">{{ article.headline }}</p>
 				</div>
-				<p v-else>No meals using '{{ getSearchedIngredientDisplay() }}' as main ingredient.</p>
+				<p v-else>No articles found with '{{ getSearchedTextDisplay() }}'</p>
 			</div>
 			<div class="pagination-box" v-if="totalPages > 1">
-				<c-button caption="< Anterior" theme="light" :disabled="currentPage <= 1" :onTap="recuarPaginacao"> </c-button>
+				<c-button caption="< Anterior" theme="light" :disabled="currentPage <= 1" :onTap="returnPagination"> </c-button>
 				<p>{{ currentPage }} / {{ totalPages }}</p>
-				<c-button caption="Próximo >" theme="light" :disabled="currentPage >= totalPages" :onTap="avancarPaginacao"> </c-button>
+				<c-button caption="Próximo >" theme="light" :disabled="currentPage >= totalPages" :onTap="forwardPagination"> </c-button>
 			</div>
 		</section>
 	</div>
@@ -43,6 +43,7 @@ import Vue from "vue";
 import ApiHelper from "static/libraries/ApiHelper";
 import LibUtils from "static/libraries/libUtils";
 import mixinsHelper from "~/mixins/mixins-helper";
+import articlesMixin from "~/mixins/articles";
 import axios from "axios";
 import LoadSpinner from "@/components/LoadSpinner.vue";
 import SearchBox from "@/components/SearchBox.vue";
@@ -52,15 +53,16 @@ export default Vue.extend({
 		"load-spinner": LoadSpinner,
 		"c-search-box": SearchBox,
 	},
-	mixins: [mixinsHelper],
+	mixins: [mixinsHelper, articlesMixin],
 	data: () => {
 		return {
 			searchText: "",
-			meals: [],
-			mealsDisplaying: [],
-			perPageLimit: 20,
+			articles: [],
+			articlesShowing: [],
+			perPageLimit: 10,
 			currentPage: 1,
 			totalPages: 1,
+			errorMessage: "",
 			isFetchingData: false,
 		};
 	},
@@ -72,33 +74,32 @@ export default Vue.extend({
 		}
 
 		if (LibUtils.isFilled(this.searchText)) {
-			this.getMealsByIngredient(this.searchText);
+			this.getSearchedArticles(this.searchText, 0);
 		}
 	},
 
 	methods: {
 		/*
-		| função: getMealsByIngredientByIngredient
-		| Utilizando a classe auxiliar ApiHelper, cria a URL, faz uma chamada GET para API buscando
-		| as receitas que utilizem o ingrediente pesquisado
+		| função: getSearchedArticles
+		| Utilizando a classe auxiliar ApiHelper, cria a URL, faz uma chamada GET para API buscando pelo texto digitado pelo usuario
 		| ---- */
-		getMealsByIngredient: function (searchingIngredient) {
-			if (LibUtils.isFilled(searchingIngredient)) {
-				searchingIngredient = this.getNormalizedQuery(searchingIngredient.replace(/ /g, "_").toLowerCase());
+		getSearchedArticles: function (searchingText, pageNumber) {
+			if (LibUtils.isFilled(searchingText)) {
+				searchingText = this.getNormalizedQuery(searchingText.replace(/ /g, "_").toLowerCase());
 			}
 
-			if (this.searchText != searchingIngredient) {
-				this.searchText = searchingIngredient;
+			if (this.searchText != searchingText) {
+				this.searchText = searchingText;
 			}
 
-			const apiHelper = new ApiHelper("1");
-			let mealsEndpoint = apiHelper.Endpoints.category;
-			let mealsUrl = apiHelper.buildRequestUrl(mealsEndpoint, searchingIngredient);
+			const apiHelper = new ApiHelper();
+			let searchEndpoint = apiHelper.Endpoints.search;
+			let apiUrl = apiHelper.buildRequestUrl(searchEndpoint, searchingText);
 
-			if (LibUtils.isFilled(mealsUrl)) {
+			if (LibUtils.isFilled(apiUrl)) {
 				this.isFetchingData = true;
 				axios
-					.get(mealsUrl)
+					.get(apiUrl)
 					.then(
 						function (response) {
 							this.isFetchingData = false;
@@ -108,8 +109,8 @@ export default Vue.extend({
 					.catch(
 						function (error) {
 							this.isFetchingData = false;
-							let errorMsg = "Erro ao buscar dados na API: " + error;
-							alert(errorMsg);
+							let errorMsg = "Ops! An error occured while fetching data from API: " + error;
+							this.errorMessage = errorMsg;
 							console.error(errorMsg);
 						}.bind(this)
 					);
@@ -117,10 +118,10 @@ export default Vue.extend({
 		},
 
 		/*
-		| função: getSearchedIngredientDisplay
+		| função: getSearchedTextDisplay
 		| Realiza replace de '_' por espaço, para exibir o texto de busca de forma legível
 		| ---- */
-		getSearchedIngredientDisplay: function () {
+		getSearchedTextDisplay: function () {
 			if (LibUtils.isFilled(this.searchText)) {
 				return this.searchText.toString().replace(/_/g, " ");
 			}
@@ -131,71 +132,48 @@ export default Vue.extend({
 		| Verifica integridade dos dados recebidos e caso ok, atribui à propriedade
 		| ---- */
 		verifyData: function (data) {
+			this.totalPages = 0;
+			this.articles = [];
 			if (LibUtils.isFilled(data)) {
-				this.meals = data.meals || [];
-				this.paginarDados();
-			}
-		},
-
-		/*
-		| função: goToMealDetails
-		| Listener de click para meals, ao clicar irá abrir a page de detalhes da meal selecionada
-		| ---- */
-		goToMealDetails: function (meal) {
-			if (LibUtils.isFilled(meal)) {
-				let params = {
-					meal: meal.strMeal,
-					id: meal.idMeal,
-				};
-				this.navigate("receita", params);
-			}
-		},
-		
-		/*
-		| função: paginarDados
-		| Corre do ponto inicial ao limite por exibição e coloca no array que será usado para exibição
-		| ---- */
-		paginarDados: function () {
-			this.totalPages = Math.ceil(this.meals.length / this.perPageLimit);
-
-			this.mealsDisplaying = [];
-			let i = (this.currentPage - 1) * this.perPageLimit;
-
-			let limite = i > 0 ? i * 2 : this.perPageLimit;
-			if (limite >= this.meals.length) {
-				limite = this.meals.length;
-			}
-
-			for (i; i < limite; i++) {
-				let meal = this.meals[i];
-				if (LibUtils.isFilled(meal)) {
-					this.mealsDisplaying.push(meal);
+				let response = data.response;
+				if (response != null) {
+					this.articles = response.docs || [];
+					this.normalizeArticlesData(this.articles);
+					this.totalPages = Math.ceil(response.meta.hits / this.perPageLimit);
 				}
 			}
-
-			let scrollTo = this.$refs.section_meals;
+			console.log(this.articles);
+			let scrollTo = this.$refs.section_articles;
 			if (scrollTo != null) {
 				scrollTo.scrollIntoView({ behavior: "smooth" });
 			}
 		},
 
 		/*
+		| função: rebuildPagination
+		| Corre do ponto inicial ao limite por exibição e coloca no array que será usado para exibição
+		| ---- */
+		rebuildPagination: function () {
+			this.getSearchedArticles(this.searchText, this.currentPage);
+		},
+
+		/*
 		| funções relativas à avançar e recuar paginação
 		| ---- */
-		avancarPaginacao: function () {
+		forwardPagination: function () {
 			this.currentPage++;
 			if (this.currentPage > this.totalPages) {
 				this.currentPage = this.totalPages;
 			}
-			this.paginarDados();
+			this.rebuildPagination();
 		},
 
-		recuarPaginacao: function () {
+		returnPagination: function () {
 			this.currentPage--;
 			if (this.currentPage < 1) {
 				this.currentPage = 1;
 			}
-			this.paginarDados();
+			this.rebuildPagination();
 		},
 	},
 });
@@ -207,7 +185,7 @@ export default Vue.extend({
 	margin: 8px auto;
 }
 
-.meals-holder {
+.articles-holder {
 	display: flex;
 	flex-direction: column;
 	gap: 5px;
@@ -219,7 +197,7 @@ export default Vue.extend({
 	box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-.meal-row {
+.article-row {
 	width: 100%;
 	display: flex;
 	flex-direction: row;
@@ -230,17 +208,17 @@ export default Vue.extend({
 	align-items: center;
 }
 
-.meal-row:hover {
+.article-row:hover {
 	border-color: rgb(175, 175, 175);
 	background: rgba(40, 170, 60, 0.4);
 	cursor: pointer;
 }
 
-.meal-row:hover .meal-name {
+.article-row:hover .article-name {
 	color: #000000;
 }
 
-.meal-image-holder {
+.article-image-holder {
 	display: inline-flex;
 	width: 86px;
 	height: 86px;
@@ -248,7 +226,7 @@ export default Vue.extend({
 	flex-shrink: 0;
 }
 
-.meal-name {
+.article-name {
 	display: inline-flex;
 	padding: 0 12px;
 	color: #222222;
@@ -264,7 +242,7 @@ export default Vue.extend({
 }
 
 @media (max-width: 991px) {
-	.meals-holder {
+	.articles-holder {
 		margin: 0 2% 10px 2%;
 	}
 
@@ -282,7 +260,7 @@ export default Vue.extend({
 		width: 86px;
 	}
 
-	.meals-holder {
+	.articles-holder {
 		padding: 5px;
 	}
 

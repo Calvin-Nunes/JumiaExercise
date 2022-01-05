@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "eslint-config-prettier": "^8.3.0",
+    "jest": "^27.4.7",
     "prettier": "^2.3.2",
     "sass": "^1.26.11",
     "sass-loader": "^10.0.2"

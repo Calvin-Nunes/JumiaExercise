@@ -13,8 +13,8 @@
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-  background: -webkit-gradient(linear, left top, left bottom, from(#f6f6f6), color-stop(50%, #ffffff), color-stop(90%, #f6f6f6));
-  background: linear-gradient(180deg, #f6f6f6 0%, #ffffff 50%, #f6f6f6 90%);
+  background: -webkit-gradient(linear, left top, left bottom, from(#f6f6f6), color-stop(60%, #ffffff), color-stop(90%, #f6f6f6));
+  background: linear-gradient(180deg, #f6f6f6 0%, #ffffff 60%, #f6f6f6 90%);
   position: relative;
 }
 
@@ -106,7 +106,7 @@
     display: -webkit-inline-box;
     display: -ms-inline-flexbox;
     display: inline-flex;
-    max-width: calc(50% - 8px);
+    max-width: 390px;
     max-height: 380px;
     margin: 0 8px 0 0;
   }
@@ -118,7 +118,7 @@
     max-height: 380px;
     -o-object-fit: contain;
        object-fit: contain;
-    margin: 0 auto;
+    margin: 0;
     text-align: center;
   }
   .thumbnail-article-card[data-article-index="0"] .thumbnail-article-infos {
@@ -135,7 +135,7 @@
     -webkit-box-flex: 1;
         -ms-flex-positive: 1;
             flex-grow: 1;
-    max-width: 50%;
+    max-width: calc(100% - 400px);
   }
   .thumbnail-article-card[data-article-index="0"] .thumbnail-article-title {
     text-align: left;

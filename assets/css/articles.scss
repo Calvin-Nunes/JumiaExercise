@@ -85,7 +85,7 @@
 
 		.thumbnail-article-image-holder {
 			display: inline-flex;
-			max-width: calc(50% - 8px);
+			max-width: 390px;
 			max-height: 380px;
 			margin: 0 8px 0 0;
 		}
@@ -97,7 +97,7 @@
 			height: auto;
 			max-height: 380px;
 			object-fit: contain;
-			margin: 0 auto;
+			margin: 0;
 			text-align: center;
 		}
 
@@ -106,7 +106,7 @@
 			flex-direction: column;
 			justify-content: center;
 			flex-grow: 1;
-			max-width: 50%;
+			max-width: calc(100% - 400px);
 		}
 
 		.thumbnail-article-title {

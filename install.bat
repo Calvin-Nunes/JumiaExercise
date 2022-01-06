@@ -6,6 +6,7 @@ cd %~dp0
 echo ">>> Local da Instalacao:" %~dp0
 echo ">>> Instalando pacotes basicos..."
 npm install
+npm audit fix
 echo ">>> Fim da instalação"
 echo "utilize o run_app.bat para iniciar a aplicação"
 echo "<--------->"
